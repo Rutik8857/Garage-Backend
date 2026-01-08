@@ -24,6 +24,7 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const userRoutes = require('./routes/userRoutes');
 const washingCardRoutes = require('./routes/washingCardRoutes');
 const washingJobRoutes = require('./routes/washingJobRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // --- API Endpoints ---
 app.use('/api/auth', authRoutes);
@@ -41,6 +42,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/washing-cards', washingCardRoutes);
 app.use('/api/washing-jobs', washingJobRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
   res.send('Server is running!');
