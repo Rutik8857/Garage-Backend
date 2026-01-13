@@ -2,11 +2,24 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors(
+  {
+  origin: [
+    'http://localhost:3000',               // local frontend
+    'https://garagewebfrontend.vercel.app'     // vercel frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}
+));
+
+app.options('*', cors());
+
+
+
 app.use(express.json());
 
 // --- Route Imports ---
@@ -64,4 +77,5 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log("update 13jan");
 });
