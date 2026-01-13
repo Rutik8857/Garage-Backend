@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -44,9 +45,21 @@ app.use('/api/washing-cards', washingCardRoutes);
 app.use('/api/washing-jobs', washingJobRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
+
+//public profile
+
+app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
+
+
+
+
 app.get('/', (req, res) => {
   res.send('Server is running!');
 });
+
+
+
+
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

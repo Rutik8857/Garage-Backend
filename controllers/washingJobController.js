@@ -842,6 +842,7 @@ const getWashingJobById = async (req, res) => {
   const { id } = req.params;
 
   try {
+    console.log(`[getWashingJobById] id=${id}`);
     const [rows] = await db.query(
       `SELECT * FROM washing_job_cards WHERE id = ?`,
       [id]
@@ -862,8 +863,9 @@ const getWashingJobById = async (req, res) => {
 
     res.status(200).json({ success: true, data: job });
   } catch (err) {
-    console.error('Error fetching washing job:', err);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    console.error('Error fetching washing job:', err && err.stack ? err.stack : err);
+    // Return error.message in response for easier debugging in development
+    res.status(500).json({ success: false, message: 'Server Error', error: err.message });
   }
 };
 

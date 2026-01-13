@@ -1,29 +1,11 @@
-// // routes/user.routes.js
-// const express = require('express');
-// const router = express.Router();
-// const userController = require('../controllers/user.controller');
-
-// // --- User Routes ---
-
-// // @route   POST /api/users/add
-// // @desc    Add a new user
-// // @access  Public
-// router.post('/add', userController.createUser);
-
-// // You can add more user-related routes here (e.g., get users, update user)
-// // router.get('/', userController.getAllUsers);
-// // router.get('/:id', userController.getUserById);
-
-// module.exports = router;
-
-
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const upload = require('../middleware/upload.js');
 
 // Use the real controller to create users
 // POST /api/users
-router.post('/', userController.createUser);
+router.post('/', upload.single('profile_image'), userController.createUser);
 
 router.get('/', userController.getAllUsers);
 

@@ -1,58 +1,127 @@
 // controllers/user.controller.js
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs');
 
-// Controller function to create a new user
-exports.createUser = async (req, res) => {
-    try {
-        // 1. Destructure data from request body
-        const { name, email, mobile_number, password, confirmPassword } = req.body;
+// // Controller function to create a new user
+// exports.createUser = async (req, res) => {
+//     try {
+//         // 1. Destructure data from request body
+//         const { name, email, mobile_number, password, confirmPassword } = req.body;
 
-        // 2. --- Basic Validation ---
-        if (!name || !email || !password || !confirmPassword) {
-            return res.status(400).json({ message: 'Please fill in all required fields.' });
-        }
 
-        // Check if passwords match
-        if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Passwords do not match.' });
-        }
+//         const profileImage = req.file
+//     ? `/uploads/profile/${req.file.filename}`
+//     : "/uploads/profile/default.png";
 
-        // 3. --- Hash Password ---
-        // Generate a salt
-        const salt = await bcrypt.genSalt(10);
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, salt);
 
-        // 4. --- Create SQL Query ---
-        // Note: the `users` table in this database uses the column name `password`.
-        // Insert the hashed password into the `password` column so the query matches schema.
-        const sql = 'INSERT INTO users (name, email, mobile_number, password) VALUES (?, ?, ?, ?)';
-        const values = [name, email, mobile_number, hashedPassword];
 
-        // 5. --- Execute Query ---
-        // We don't need the result, so we just await the execution
-        await db.query(sql, values);
+//         // 2. --- Basic Validation ---
+//         if (!name || !email || !password || !confirmPassword) {
+//             return res.status(400).json({ message: 'Please fill in all required fields.' });
+//         }
 
-        // 6. --- Send Success Response ---
-        res.status(201).json({ message: 'User created successfully!' });
+//         // Check if passwords match
+//         if (password !== confirmPassword) {
+//             return res.status(400).json({ message: 'Passwords do not match.' });
+//         }
 
-    } catch (error) {
-        // 7. --- Error Handling ---
-        console.error('Error creating user:', error);
+//         // 3. --- Hash Password ---
+//         // Generate a salt
+//         const salt = await bcrypt.genSalt(10);
+//         // Hash the password
+//         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Check for duplicate email error
-        if (error.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ message: 'Email already exists.' });
-        }
+//         // 4. --- Create SQL Query ---
+//         // Note: the `users` table in this database uses the column name `password`.
+//         // Insert the hashed password into the `password` column so the query matches schema.
+//         const sql = 'INSERT INTO users (name, email, mobile_number, password) VALUES (?, ?, ?, ?)';
+//         const values = [name, email, mobile_number, hashedPassword];
 
-        // Generic server error
-        res.status(500).json({ message: 'Server error, please try again later.' });
-    }
+//         // 5. --- Execute Query ---
+//         // We don't need the result, so we just await the execution
+//         await db.query(sql, values);
+
+//         // 6. --- Send Success Response ---
+//         res.status(201).json({ message: 'User created successfully!' });
+
+//     } catch (error) {
+//         // 7. --- Error Handling ---
+//         console.error('Error creating user:', error);
+
+//         // Check for duplicate email error
+//         if (error.code === 'ER_DUP_ENTRY') {
+//             return res.status(409).json({ message: 'Email already exists.' });
+//         }
+
+//         // Generic server error
+//         res.status(500).json({ message: 'Server error, please try again later.' });
+//     }
 
 
     
+// };
+
+exports.createUser = async (req, res) => {
+  try {
+    const { name, email, mobile_number, password, confirmPassword } = req.body;
+
+    // ✅ profile image path
+    const profileImage = req.file
+      ? `/uploads/profile/${req.file.filename}`
+      : "/uploads/profile/default.png";
+
+    // Basic validation
+    if (!name || !email || !password || !confirmPassword) {
+      return res.status(400).json({ message: 'Please fill in all required fields.' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match.' });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // ✅ profile_image column added
+    const sql = `
+      INSERT INTO users 
+      (name, email, mobile_number, password, profile_image)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    const values = [
+      name,
+      email,
+      mobile_number,
+      hashedPassword,
+      profileImage
+    ];
+
+    await db.query(sql, values);
+
+    res.status(201).json({
+      message: 'User created successfully!',
+      profile_image: profileImage
+    });
+
+  } catch (error) {
+    console.error('Error creating user:', error);
+
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ message: 'Email already exists.' });
+    }
+
+    res.status(500).json({ message: 'Server error, please try again later.' });
+  }
 };
+
+
+
+
+
 exports.getAllUsers = async (req, res) => {
     try {
         // 1. --- Create SQL Query ---
@@ -79,7 +148,16 @@ exports.getAllUsers = async (req, res) => {
         const { id } = req.params;
 
         // 2. Create SQL Query
-        const sql = 'DELETE FROM users WHERE id = ?';
+        // const sql = 'DELETE FROM users WHERE id = ?';
+
+      const sql = `
+  SELECT id, name, email, mobile_number, profile_image, created_at
+  FROM users
+  ORDER BY created_at DESC
+`;
+
+
+
 
         // 3. Execute Query
         const [result] = await db.query(sql, [id]);
@@ -108,20 +186,51 @@ exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Example query (MySQL)
     const [rows] = await db.query(
-      'SELECT id, name, email, mobile_number FROM users WHERE id = ?',
+      'SELECT id, name, email, mobile_number, profile_image FROM users WHERE id = ?',
       [id]
     );
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    res.json(rows[0]);
+    const user = rows[0];
+
+    // Build absolute URL for profile image
+    const baseUrl = (process.env.BASE_URL && process.env.BASE_URL.replace(/\/$/, '')) ||
+      (req.get('x-forwarded-proto') || req.protocol) + '://' + req.get('host');
+
+    const DEFAULT_IMAGE = '/profile-logo.jpg';
+
+    let profileImageUrl = baseUrl + DEFAULT_IMAGE;
+
+    if (user.profile_image) {
+      // normalize path
+      let stored = user.profile_image.replace(/\\/g, '/');
+      stored = stored.replace(/^public\//i, '').replace(/^\/+/, '/');
+      const fsPath = path.join(process.cwd(), 'public', stored.replace(/^\/+/, ''));
+      if (fs.existsSync(fsPath)) {
+        profileImageUrl = baseUrl + (stored.startsWith('/') ? stored : '/' + stored);
+      } else {
+        // if stored doesn't exist, keep default
+        profileImageUrl = baseUrl + DEFAULT_IMAGE;
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profileImage: profileImageUrl
+      }
+    });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 

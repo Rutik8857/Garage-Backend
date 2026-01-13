@@ -46,6 +46,14 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+const path = require('path');
+
+// Serve uploaded files and static public assets
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
+app.use(express.static(path.join(process.cwd(), 'public')));
+
+// Trust proxy when behind load balancer / reverse proxy (ensures correct req.protocol)
+app.set('trust proxy', true);
 
 // --- 2. Use the routes file ---
 // Any request starting with '/api/jobcards' will be handled by jobCardRoutes
