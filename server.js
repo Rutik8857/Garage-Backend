@@ -9,7 +9,7 @@ app.use(cors(
   {
   origin: [
     'http://localhost:3000',               // local frontend
-    'https://garagewebfrontend.vercel.app'     // vercel frontend
+    'https://garage-frontend-ten.vercel.app'     // vercel frontend
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true

@@ -2,6 +2,23 @@ require('dotenv').config(); // Load environment variables
 const express = require('express');
 const cors = require('cors');
 const { errorHandler } = require('./middleware/errorHandler');
+const app = express();
+
+
+app.use(cors(
+  {
+  origin: [
+    'http://localhost:3000',               // local frontend
+    'https://garage-frontend-ten.vercel.app'     // vercel frontend
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}
+));
+
+app.options('*', cors());
+
+
 
 // This line imports and runs your database connection pool
 require('./config/db'); 
@@ -39,7 +56,6 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 
 
-const app = express();
 
 
 
