@@ -45,7 +45,7 @@ export default function ResetPasswordTokenPage() {
     }
 
     try {
-      const response = await Axios.post('http://localhost:3001/api/auth/reset-password', {
+      const response = await Axios.post('NEXT_PUBLIC_API_URL/api/auth/reset-password', {
         token,
         newPassword,
       });

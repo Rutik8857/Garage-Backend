@@ -8,7 +8,6 @@ let sendPasswordResetEmail;
 try {
     const emailService = require('../utils/emailService');
     sendPasswordResetEmail = emailService.sendPasswordResetEmail;
-    console.log('Email service loaded successfully');
 } catch (emailServiceError) {
     console.error('Failed to load email service:', emailServiceError);
     // Create a fallback function
@@ -68,23 +67,16 @@ const login = tryCatch(async (req, res) => {
  * Request body: { email: "user@example.com" }
  */
 const forgotPassword = tryCatch(async (req, res) => {
-    console.log('=== FORGOT PASSWORD REQUEST ===');
-    console.log('Request body:', req.body);
-    console.log('Request headers:', req.headers);
-    
     const { email } = req.body;
 
     // 1. Validate email format
     if (!email) {
-        console.log('Validation failed: Email is missing');
         return res.status(400).json({
             success: false,
             message: 'Email is required.'
         });
     }
     
-    console.log('Processing forgot password for email:', email);
-
     // Basic email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -117,11 +109,6 @@ const forgotPassword = tryCatch(async (req, res) => {
     // Save token and expiry in MySQL
     await userModel.updateUserResetToken(user.id, resetToken, resetTokenExpiry);
     
-    // Log the token and link for debugging purposes
-    console.log('=== PASSWORD RESET DEBUG ===');
-    console.log('Generated Token:', resetToken);
-    console.log('If email fails, use this link:', `http://localhost:3000/reset-password?token=${resetToken}`);
-
     try {
         // Send password reset email to user's email address
         await sendPasswordResetEmail(user.email, resetToken);
@@ -152,9 +139,7 @@ const forgotPassword = tryCatch(async (req, res) => {
  * Request body: { token: "RESET_TOKEN", newPassword: "new_password_here" }
  */
 const resetPassword = tryCatch(async (req, res) => {
-    console.log('=== RESET PASSWORD ATTEMPT ===');
     const { token, newPassword } = req.body;
-    console.log('Received Token:', token);
     
     // 1. Validate token and new password
     if (!token || !newPassword) {

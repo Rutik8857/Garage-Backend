@@ -5,18 +5,17 @@ const { errorHandler } = require('./middleware/errorHandler');
 const app = express();
 
 
-app.use(cors(
-  {
+const corsOptions = {
   origin: [
     'http://localhost:3000',               // local frontend
     'https://garage-frontend-ten.vercel.app'     // vercel frontend
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
-}
-));
+};
 
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 
 
@@ -30,8 +29,13 @@ function safeRequire(path) {
     return require(path);
   } catch (err) {
     console.error(`Failed to require ${path}:`, err && err.message ? err.message : err);
-    // Exit with non-zero code so the docker/pm2/npm process shows failure
-    process.exit(1);
+    // Return a placeholder middleware so the server can start even if a module is missing
+    return (req, res, next) => {
+      res.status(500).json({ 
+        success: false, 
+        message: `Module ${path} failed to load.` 
+      });
+    };
   }
 }
 
@@ -60,7 +64,6 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 
 // Middleware
-app.use(cors());
 app.use(express.json());
 const path = require('path');
 

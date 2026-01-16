@@ -11,7 +11,7 @@ app.use(cors(
     'http://localhost:3000',               // local frontend
     'https://garage-frontend-ten.vercel.app'     // vercel frontend
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT','PATCH' ,'DELETE'],
   credentials: true
 }
 ));
@@ -59,9 +59,35 @@ app.use('/api/washing-jobs', washingJobRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 
-//public profile
+// Public uploads - serve static files with proper CORS headers
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://garage-frontend-ten.vercel.app',
+];
 
-app.use("/uploads", express.static(path.join(process.cwd(), "public/uploads")));
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'public/uploads'), {
+    setHeaders: (res, filePath, stat) => {
+      // If Origin header present and allowed, mirror it; otherwise fall back to wildcard
+      // Note: using wildcard disallows credentials; if you need cookies set a specific origin.
+      res.setHeader(
+        'Access-Control-Allow-Origin',
+        (req => {
+          try {
+            const origin = req && req.headers && req.headers.origin;
+            if (origin && allowedOrigins.includes(origin)) return origin;
+          } catch (e) {}
+          return '*';
+        })(res.req)
+      );
+      res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+      // Optional: caching for performance
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+    },
+  })
+);
 
 
 
@@ -79,3 +105,8 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log("update 13jan");
 });
+
+
+
+
+

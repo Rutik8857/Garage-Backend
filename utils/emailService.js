@@ -24,14 +24,12 @@ if (isEmailConfigured()) {
         pass: process.env.EMAIL_PASS, // Use App Password for Gmail
       },
     });
-    console.log('✓ Email transporter configured successfully');
   } catch (error) {
     console.error('Error creating email transporter:', error);
     transporter = null;
   }
 } else {
   transporter = null;
-  console.log('⚠️  Email transporter not created - using console logging mode');
 }
 
 /**
