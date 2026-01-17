@@ -68,7 +68,7 @@ app.use(express.json());
 const path = require('path');
 
 // Serve uploaded files and static public assets
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use('/uploads/profile', express.static(path.join(__dirname, '../public/uploads/profile')));
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Trust proxy when behind load balancer / reverse proxy (ensures correct req.protocol)

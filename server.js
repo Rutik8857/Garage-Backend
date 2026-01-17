@@ -66,8 +66,8 @@ const allowedOrigins = [
 ];
 
 app.use(
-  '/uploads',
-  express.static(path.join(__dirname, '../public/uploads'), {
+  '/uploads/profile',
+  express.static(path.join(__dirname, '../public/uploads/profile'), {
     setHeaders: (res, filePath, stat) => {
       // If Origin header present and allowed, mirror it; otherwise fall back to wildcard
       // Note: using wildcard disallows credentials; if you need cookies set a specific origin.
