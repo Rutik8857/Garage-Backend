@@ -44,7 +44,7 @@ const sendPasswordResetEmail = async (email, resetToken) => {
     throw new Error('Email transporter not configured. Please set EMAIL_USER and EMAIL_PASS environment variables.');
   }
 
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  const resetLink = `https://garage-frontend-ten.vercel.app/reset-password?token=${resetToken}`;
 
   const mailOptions = {
     from: `"${process.env.EMAIL_FROM_NAME || 'Your App'}" <${process.env.EMAIL_USER}>`,

@@ -27,7 +27,7 @@ async function setupEmail() {
   const emailUser = await question('Enter your Gmail address (e.g., yourname@gmail.com): ');
   const emailPass = await question('Enter your Gmail App Password (16 characters): ');
   const emailFromName = await question('Enter sender name (e.g., Garage Management System) [default: Garage Management System]: ') || 'Garage Management System';
-  const frontendUrl = await question('Enter frontend URL (e.g., http://localhost:3000) [default: http://localhost:3000]: ') || 'http://localhost:3000';
+  const frontendUrl = await question('Enter frontend URL (e.g., https://garage-frontend-ten.vercel.app) [default: https://garage-frontend-ten.vercel.app]: ') || 'https://garage-frontend-ten.vercel.app';
   
   // Read existing .env file
   let envContent = '';
