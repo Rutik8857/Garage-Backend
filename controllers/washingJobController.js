@@ -318,6 +318,29 @@ const getWashingJobStatusCounts = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Delete a washing job
+ * @route   DELETE /api/washing-jobs/:id
+ */
+const deleteWashingJob = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Optional: Delete related items first if foreign keys don't cascade
+    await db.query('DELETE FROM washing_job_items WHERE washing_job_id = ?', [id]);
+
+    const [result] = await db.query('DELETE FROM washing_job_cards WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Washing job not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Washing job deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting washing job:', err);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
 module.exports = {
   createWashingJob,
   getAllWashingJobs,
@@ -325,4 +348,5 @@ module.exports = {
   updateWashingJob,
   updateWashingJobStatus,
   getWashingJobStatusCounts,
+  deleteWashingJob,
 };

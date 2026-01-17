@@ -63,6 +63,8 @@ const fs = require('fs');
     
 // };
 
+
+
 exports.createUser = async (req, res) => {
   try {
     const { name, email, mobile_number, password, confirmPassword } = req.body;
@@ -150,11 +152,7 @@ exports.getAllUsers = async (req, res) => {
         // 2. Create SQL Query
         // const sql = 'DELETE FROM users WHERE id = ?';
 
-      const sql = `
-  SELECT id, name, email, mobile_number, profile_image, created_at
-  FROM users
-  ORDER BY created_at DESC
-`;
+        const sql = 'DELETE FROM users WHERE id = ?';
 
 
 
@@ -169,7 +167,7 @@ exports.getAllUsers = async (req, res) => {
 
         // 5. Send Success Response
         // 204 "No Content" is common for a successful delete
-        res.status(204).send(); 
+        res.status(200).json({ success: true, message: 'User deleted successfully' });
 
     } catch (error) {
         // 6. Error Handling

@@ -67,7 +67,7 @@ const allowedOrigins = [
 
 app.use(
   '/uploads',
-  express.static(path.join(__dirname, 'public/uploads'), {
+  express.static(path.join(__dirname, '../public/uploads'), {
     setHeaders: (res, filePath, stat) => {
       // If Origin header present and allowed, mirror it; otherwise fall back to wildcard
       // Note: using wildcard disallows credentials; if you need cookies set a specific origin.
@@ -89,6 +89,8 @@ app.use(
   })
 );
 
+// Fallback: Serve other static files from public root
+app.use(express.static(path.join(__dirname, '../public')));
 
 
 
@@ -105,8 +107,3 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log("update 13jan");
 });
-
-
-
-
-
